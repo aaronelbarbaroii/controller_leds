@@ -1,0 +1,21 @@
+name: controller_leds
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.10.8
+
+dependencies:
+  flex_color_picker: ^3.8.0
+  flutter:
+    sdk: flutter
+  flutter_blue_plus: ^2.1.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
