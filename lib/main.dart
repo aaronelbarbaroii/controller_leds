@@ -510,7 +510,138 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
+      theme: ThemeData(
+        useMaterial3: true, // Usa Material Design 3 (más moderno) si es true
+        // https://docs.flutter.dev/cookbook/design/themes
+
+        // ===== COLORES PRINCIPALES =====
+        primaryColor:
+            Colors.blue, // Color primario principal (AppBar, botones, etc)
+        primarySwatch: Colors
+            .blue, // Paleta de colores derivada del color primario (DEPRECATED, usa ColorScheme)
+        // ===== COLOR SCHEME (Moderna, Material Design 3) =====
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.lightBlue,
+          brightness: Brightness.light,
+        ),
+
+        // ===== COLORES SECUNDARIOS =====
+        // secondaryHeaderColor: Colors.orange,  // Color secundario
+
+        // ===== FONDOS =====
+        scaffoldBackgroundColor: Colors.white, // Fondo del Scaffold
+        // backgroundColor: Colors.grey[100],  // Fondo general (deprecated)
+
+        // ===== BRILLO (Claro/Oscuro) =====
+        brightness: Brightness.light, // Claro (light) u Oscuro (dark)
+        // ===== TIPOGRAFÍA (TextTheme) =====
+        // Define todos los estilos de texto predefinidos para la app
+        textTheme: TextTheme(
+          // === ESTILOS DISPLAY (Muy grandes, para títulos principales) ===
+          displayLarge: TextStyle(
+            fontSize: 32, // Tamaño muy grande
+            fontWeight: FontWeight.bold, // Peso: bold (700)
+            // Uso: Títulos principales, pantallas de inicio
+          ),
+          displayMedium: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            // Uso: Títulos secundarios
+          ),
+          displaySmall: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            // Uso: Subtítulos importantes
+          ),
+
+          // === ESTILOS HEADLINE (Encabezados medianos) ===
+          headlineLarge: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w700, // 700 = bold
+            // Uso: Encabezados de secciones principales
+          ),
+          headlineMedium: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w600, // 600 = semibold
+            // Uso: Encabezados de subsecciones, títulos de tarjetas
+          ),
+          headlineSmall: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            // Uso: Títulos pequeños, items importantes
+          ),
+
+          // === ESTILOS TITLE (Títulos para etiquetas y labels) ===
+          titleLarge: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500, // 500 = medium
+            // Uso: Títulos de listas, botones grandes
+          ),
+          titleMedium: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            // Uso: Etiquetas, títulos de diálogos
+          ),
+          titleSmall: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            // Uso: Labels pequeños, avisos
+          ),
+
+          // === ESTILOS BODY (Cuerpo del texto, el más usado) ===
+          bodyLarge: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.normal, // 400 = normal/regular
+            // Uso: Párrafos principales, texto descriptivo importante
+          ),
+          bodyMedium: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.normal,
+            // Uso: Texto general de la aplicación, párrafos normales
+          ),
+          bodySmall: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.normal,
+            // Uso: Descripción pequeña, meta información, timestamps
+          ),
+
+          // === ESTILOS LABEL (Para etiquetas y botones pequeños) ===
+          labelLarge: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            // Uso: Botones, etiquetas grandes
+          ),
+          labelMedium: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            // Uso: Chips, badges
+          ),
+          labelSmall: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+            // Uso: Labels muy pequeños, indicadores
+          ),
+        ),
+
+        // ===== BARRA SUPERIOR (AppBar) =====
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.blue,
+          foregroundColor: Colors.white,
+          elevation: 4,
+          centerTitle: true,
+        ),
+      ),
+       darkTheme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.lightBlue,
+          brightness: Brightness.dark,
+        ),
+        scaffoldBackgroundColor: Colors.black,
+      ),
+      themeMode: ThemeMode
+          .system, 
       debugShowCheckedModeBanner: false,
       home: ControllerLeds(),
     );
@@ -539,7 +670,7 @@ class _ControllerLedsState extends State<ControllerLeds> {
 
   Future<void> escanear() async {
     if (!await FlutterBluePlus.isSupported) {
-      _mostrarSnack("Bluetooth no soportado", error: true);
+      _mostrarSnack("Bluetooth not supported", error: true);
       return;
     }
 
@@ -549,7 +680,7 @@ class _ControllerLedsState extends State<ControllerLeds> {
 
     var subscription = FlutterBluePlus.onScanResults.listen(
       (results) => setState(() => resultadosEscaneo = results),
-      onError: (_) => _mostrarSnack("Error en escaneo", error: true),
+      onError: (_) => _mostrarSnack("Scan error", error: true),
     );
 
     await FlutterBluePlus.startScan(timeout: const Duration(seconds: 5));
@@ -561,7 +692,7 @@ class _ControllerLedsState extends State<ControllerLeds> {
 
   Future<void> conectar() async {
     if (dispositivoSeleccionado == null) {
-      _mostrarSnack("Selecciona un dispositivo", error: true);
+      _mostrarSnack("Select a device", error: true);
       return;
     }
 
@@ -570,9 +701,9 @@ class _ControllerLedsState extends State<ControllerLeds> {
       await dispositivoSeleccionado!.connect(license: License.free);
       await _obtenerCaracteristica(dispositivoSeleccionado!);
 
-      _mostrarSnack("Conectado a ${dispositivoSeleccionado!.platformName}");
+      _mostrarSnack("Connected to ${dispositivoSeleccionado!.platformName}");
     } catch (e) {
-      _mostrarSnack("Error de conexión: $e", error: true);
+      _mostrarSnack("Connection error: $e", error: true);
     }
   }
 
@@ -583,13 +714,13 @@ class _ControllerLedsState extends State<ControllerLeds> {
       for (var characteristic in service.characteristics) {
         if (characteristic.uuid.toString().toUpperCase().contains("FFD9")) {
           txCharacteristic = characteristic;
-          _mostrarSnack("Característica encontrada");
+          //_mostrarSnack("Característica encontrada");
           return;
         }
       }
     }
 
-    _mostrarSnack("Característica no encontrada", error: true);
+    _mostrarSnack("Feature not found", error: true);
   }
 
   /* ===================== ACCIONES ===================== */
@@ -612,7 +743,7 @@ class _ControllerLedsState extends State<ControllerLeds> {
 
   Future<void> _enviarComando(List<int> datos) async {
     if (txCharacteristic == null) {
-      _mostrarSnack("No conectado al dispositivo", error: true);
+      _mostrarSnack("Not connected to device", error: true);
       return;
     }
 
@@ -622,7 +753,7 @@ class _ControllerLedsState extends State<ControllerLeds> {
         withoutResponse: false,
       );
     } catch (e) {
-      _mostrarSnack("Error al enviar: $e", error: true);
+      _mostrarSnack("Error sending: $e", error: true);
     }
   }
 
@@ -646,163 +777,169 @@ class _ControllerLedsState extends State<ControllerLeds> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          "Controlador LED Bluetooth",
+          "Bluetooth LED controller",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         backgroundColor: Colors.lightBlue,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 16),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(
-                  double.infinity,
-                  50,
-                ), // Ancho infinito, altura de 50
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(
+                    double.infinity,
+                    50,
+                  ), // Ancho infinito, altura de 50
+                ),
+                onPressed: escanear,
+                child: const Text("Search device"),
               ),
-              onPressed: escanear,
-              child: const Text("Buscar dispositivo"),
-            ),
-            const SizedBox(height: 16),
-
-            /// ===== SELECT (DROPDOWN) =====
-            DropdownButtonFormField<BluetoothDevice>(
-              initialValue: dispositivoSeleccionado,
-              decoration: const InputDecoration(
-                labelText: "Selecciona un dispositivo",
-                border: OutlineInputBorder(),
+              const SizedBox(height: 16),
+        
+              /// ===== SELECT (DROPDOWN) =====
+              DropdownButtonFormField<BluetoothDevice>(
+                initialValue: dispositivoSeleccionado,
+                decoration: const InputDecoration(
+                  labelText: "Select a device",
+                  border: OutlineInputBorder(),
+                ),
+                items: resultadosEscaneo.map((scanResult) {
+                  final device = scanResult.device;
+        
+                  return DropdownMenuItem(
+                    value: device,
+                    child: Text(
+                      device.platformName.isEmpty
+                          ? "Unknown device"
+                          : device.platformName,
+                    ),
+                  );
+                }).toList(),
+                onChanged: (device) {
+                  setState(() {
+                    dispositivoSeleccionado = device;
+                  });
+                },
               ),
-              items: resultadosEscaneo.map((scanResult) {
-                final device = scanResult.device;
-
-                return DropdownMenuItem(
-                  value: device,
-                  child: Text(
-                    device.platformName.isEmpty
-                        ? "Dispositivo desconocido"
-                        : device.platformName,
+              const SizedBox(height: 16),
+        
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(
+                    double.infinity,
+                    50,
+                  ), // Ancho infinito, altura de 50
+                ),
+                onPressed: conectar,
+                child: const Text("Connect"),
+              ),
+        
+              const SizedBox(height: 16),
+        
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                IconButton(
+                  icon: const Icon(Icons.power_settings_new),
+                  iconSize: 40,
+                  color: encendido ? Colors.red : Colors.green,
+                  onPressed: cambiarEncender,
+                ),
+                _crearBoton(0, Colors.red, Colors.white),
+                _crearBoton(1, Colors.green, Colors.white),
+                _crearBoton(2, Colors.blue, Colors.white),
+                _crearBoton(3, Colors.white, Colors.black),
+                ]
+              ),
+        
+              const SizedBox(height: 16),
+        
+              ColorPicker(
+                enableShadesSelection: true,
+                pickersEnabled: const {
+                  ColorPickerType.wheel: true,
+                  ColorPickerType.primary: true,
+                  ColorPickerType.accent: false,
+                  ColorPickerType.bw: false,
+                  ColorPickerType.custom: false,
+                  ColorPickerType.both: false,
+                },
+                onColorChanged: formatear,
+              ),
+        
+              SizedBox(height: 16),
+        
+              Center(
+                child: Text("Intensity", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 6, 73, 120)),),
+              ),
+        
+              Slider(
+                value: _valorActual,
+                min: 0x01, // 1 decimal
+                max: 0xFF, // 255 decimal
+                divisions: 254, // Opcional: para que se mueva de 1 en 1
+                label: _valorActual
+                    .round()
+                    .toRadixString(16)
+                    .toUpperCase(), // Muestra el hex en el tooltip
+                onChanged: (double nuevoValor) {
+                  setState(() {
+                    _valorActual = nuevoValor;
+                  });
+        
+                  // Llamamos a tu función convirtiendo el double a int
+                  _enviarComando([
+                    0x56,
+                    rojo,
+                    verde,
+                    azul,
+                    _valorActual.round(),
+                    0x0F,
+                    0xAA,
+                  ]);
+                },
+              ),
+        
+              SizedBox(height: 16),
+        
+              GridView.count(
+                shrinkWrap: true,
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                childAspectRatio:
+                    3, // Ajusta la proporción (ancho/alto) de los botones
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () => _enviarComando([0xBB, 0x25, 0x1F, 0x44]),
+                    label: Text('MODE 1'),
+                    icon: Icon(Icons.settings), // Añadido icon ya que usas .icon
                   ),
-                );
-              }).toList(),
-              onChanged: (device) {
-                setState(() {
-                  dispositivoSeleccionado = device;
-                });
-              },
-            ),
-            const SizedBox(height: 16),
-
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(
-                  double.infinity,
-                  50,
-                ), // Ancho infinito, altura de 50
+                  ElevatedButton.icon(
+                    onPressed: () => _enviarComando([0xBB, 0x34, 0x10, 0x44]),
+                    label: Text('MODE 2'),
+                    icon: Icon(Icons.settings),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () => _enviarComando([0xBB, 0x30, 0xCC, 0x44]),
+                    label: Text('MODE 3'),
+                    icon: Icon(Icons.settings),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () => _enviarComando([0xBB, 0x38, 0xCC, 0x44]),
+                    label: Text('MODE 4'),
+                    icon: Icon(Icons.settings),
+                  ),
+                ],
               ),
-              onPressed: conectar,
-              child: const Text("Conectar"),
-            ),
-
-            const SizedBox(height: 16),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-              IconButton(
-                icon: const Icon(Icons.power_settings_new),
-                iconSize: 40,
-                color: encendido ? Colors.red : Colors.green,
-                onPressed: cambiarEncender,
-              ),
-              _crearBoton(0, Colors.red, Colors.white),
-              _crearBoton(1, Colors.green, Colors.white),
-              _crearBoton(2, Colors.blue, Colors.white),
-              _crearBoton(3, Colors.white, Colors.black),
-              ]
-            ),
-
-            const SizedBox(height: 16),
-
-            ColorPicker(
-              enableShadesSelection: true,
-              pickersEnabled: const {
-                ColorPickerType.wheel: true,
-                ColorPickerType.primary: true,
-                ColorPickerType.accent: false,
-                ColorPickerType.bw: false,
-                ColorPickerType.custom: false,
-                ColorPickerType.both: false,
-              },
-              onColorChanged: formatear,
-            ),
-
-            SizedBox(height: 16),
-
-            Slider(
-              value: _valorActual,
-              min: 0x01, // 1 decimal
-              max: 0xFF, // 255 decimal
-              divisions: 254, // Opcional: para que se mueva de 1 en 1
-              label: _valorActual
-                  .round()
-                  .toRadixString(16)
-                  .toUpperCase(), // Muestra el hex en el tooltip
-              onChanged: (double nuevoValor) {
-                setState(() {
-                  _valorActual = nuevoValor;
-                });
-
-                // Llamamos a tu función convirtiendo el double a int
-                _enviarComando([
-                  0x56,
-                  rojo,
-                  verde,
-                  azul,
-                  _valorActual.round(),
-                  0x0F,
-                  0xAA,
-                ]);
-              },
-            ),
-
-            SizedBox(height: 16),
-
-            GridView.count(
-              shrinkWrap: true,
-              crossAxisCount: 2,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              childAspectRatio:
-                  3, // Ajusta la proporción (ancho/alto) de los botones
-              children: [
-                ElevatedButton.icon(
-                  onPressed: () => _enviarComando([0xBB, 0x25, 0x1F, 0x44]),
-                  label: Text('MODE 1'),
-                  icon: Icon(Icons.settings), // Añadido icon ya que usas .icon
-                ),
-                ElevatedButton.icon(
-                  onPressed: () => _enviarComando([0xBB, 0x34, 0x10, 0x44]),
-                  label: Text('MODE 2'),
-                  icon: Icon(Icons.settings),
-                ),
-                ElevatedButton.icon(
-                  onPressed: () => _enviarComando([0xBB, 0x30, 0xCC, 0x44]),
-                  label: Text('MODE 3'),
-                  icon: Icon(Icons.settings),
-                ),
-                ElevatedButton.icon(
-                  onPressed: () => _enviarComando([0xBB, 0x38, 0xCC, 0x44]),
-                  label: Text('MODE 4'),
-                  icon: Icon(Icons.settings),
-                ),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -825,7 +962,7 @@ class _ControllerLedsState extends State<ControllerLeds> {
     },
     style: ElevatedButton.styleFrom(
       shape: const CircleBorder(),
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(8),
       backgroundColor: colorFondo,
       // Opcional: una pequeña elevación para que se note cuál está activo
       elevation: _seleccionados[index] ? 4 : 2,
